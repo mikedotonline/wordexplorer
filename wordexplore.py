@@ -23,7 +23,12 @@ from itertools import chain
 import logging #get some logging going to make it easier to debug
 logging.basicConfig(level=logging.INFO) #optional argument, filename="tk_freebase-explorer.log" and filemode='w'
 
-
+# --------------------------------
+# class:     Application
+# description: code for the click handling and interface of the program. 
+# params:     none
+# returns:    none
+# --------------------------------
 class Application:
 	def __init__(self,master):
 		self.master = master
@@ -80,8 +85,40 @@ class Application:
 			rw.insert(tk.END,i['result']['name']) #add the items to the listbox
 
 	# --------------------------------
-	# method:     on_GKSearch_button_click
-	# description: waht to do when the search button is clicked
+	# method:     on_GKSelectAll_button_click
+	# description: select all the items in the results 
+	# params:     none
+	# returns:    none
+	# --------------------------------
+	def on_GKSelectAll_button_click(self):
+		resultsbox = self.builder.get_object('GKResults_Listbox')
+		resultsbox.select_set(0,tk.END)
+
+	# --------------------------------
+	# method:     on_WGKSelectNone_button_click
+	# description: deselect all items in results
+	# params:     none
+	# returns:    none
+	# --------------------------------
+	def on_GKSelectNone_button_click(self):
+		resultsbox = self.builder.get_object('GKResults_Listbox')
+		resultsbox.selection_clear(0,tk.END)
+
+	# --------------------------------
+	# method:     on_GKAddToMaster_button_click
+	# description: add the currently selected items to the masterlist
+	# params:     none
+	# returns:    none
+	# --------------------------------	
+	def on_GKAddToMaster_button_click(self):
+		resultsbox = self.builder.get_object('GKResults_Listbox')
+		master = self.builder.get_object('MasterList_Listbox')
+		selected =resultsbox.curselection()	
+		for i in selected:master.insert(tk.END,resultsbox.get(i))
+
+	# --------------------------------
+	# method:     on_WNSearch_button_click
+	# description: what to do when the search button is clicked
 	# params:     none
 	# returns:    none
 	# --------------------------------
@@ -115,7 +152,117 @@ class Application:
 		for i in hypernyms_list:
 			hypernyms_listbox.insert(tk.END,i) #add the items to the listbox
 		for i in hyponyms_list:
-			hyponyms_listbox.insert(tk.END,i) #add the items to the listbox		
+			hyponyms_listbox.insert(tk.END,i) #add the items to the listbox	
+	
+	# --------------------------------
+	# method:     on_WNSelectAll_button_click
+	# description: select all items in all lists
+	# params:     none
+	# returns:    none
+	# --------------------------------
+	def on_WNSelectAll_button_click(self):	
+		resultsbox1 = self.builder.get_object('WNSynonyms_Listbox') 	#get object
+		resultsbox1.select_set(0,tk.END)								#add all to selection
+		resultsbox2 = self.builder.get_object('WNHyponyms_Listbox')
+		resultsbox2.select_set(0,tk.END)
+		resultsbox3 = self.builder.get_object('WNHypernyms_Listbox')
+		resultsbox3.select_set(0,tk.END)
+
+	# --------------------------------
+	# method:     on_WNSelectNone_button_click
+	# description: clear the selected items in all lists
+	# params:     none
+	# returns:    none
+	# --------------------------------
+	def on_WNSelectNone_button_click(self):
+		resultsbox = self.builder.get_object('WNSynonyms_Listbox')	#get object
+		resultsbox.selection_clear(0,tk.END)						#clear all from selection
+		resultsbox = self.builder.get_object('WNHyponyms_Listbox')
+		resultsbox.selection_clear(0,tk.END)
+		resultsbox = self.builder.get_object('WNHypernyms_Listbox')
+		resultsbox.selection_clear(0,tk.END)
+
+	# --------------------------------
+	# method:     on_WNAddToMaster_button_click
+	# description: add the currently selected items to the master list
+	# params:     none
+	# returns:    none
+	# --------------------------------
+	def on_WNAddToMaster_button_click(self):
+		resultsbox = self.builder.get_object('WNSynonyms_Listbox')
+		master = self.builder.get_object('MasterList_Listbox')
+		selected =resultsbox.curselection()	
+		for i in selected:master.insert(tk.END,resultsbox.get(i))
+
+		resultsbox = self.builder.get_object('WNHypernyms_Listbox')
+		master = self.builder.get_object('MasterList_Listbox')
+		selected =resultsbox.curselection()	
+		for i in selected:master.insert(tk.END,resultsbox.get(i))
+
+		resultsbox = self.builder.get_object('WNHyponyms_Listbox')
+		master = self.builder.get_object('MasterList_Listbox')
+		selected =resultsbox.curselection()	
+		for i in selected:master.insert(tk.END,resultsbox.get(i))
+
+	# --------------------------------
+	# method:     on_MLDelete_button_click
+	# description: delete items from the masterlist. cannot be undone.
+	# params:     none
+	# returns:    none
+	# --------------------------------
+	def on_MLDelete_button_click(self):
+		master = self.builder.get_object('MasterList_Listbox')
+		#s = master.curselection()
+		for i in master.curselection()[::-1]:master.delete(i,i)
+
+	# --------------------------------
+	# method:     on_MLSave_button_click
+	# description: create a new masterlist file, or add to the one that is already there
+	# params:     none
+	# returns:    none
+	# --------------------------------	
+	def on_MLSave_button_click(self):
+		filenamebox = self.builder.get_object('MLFilename_Entry')
+		filename = filenamebox.get()
+		masterlist = self.builder.get_object('MasterList_Listbox')
+		tag1 = self.builder.get_object('MLTag1_Entry')
+		tag2 = self.builder.get_object('MLTag2_Entry')
+		tag3 = self.builder.get_object('MLTag3_Entry')
+		tags=[]
+		logging.info("tag1:"+tag1.get()+"\ntag2:"+tag2.get()+"\ntag3:"+tag3.get())
+		if (tag1.get() is not None and tag1.get() is not ""):
+			tags.append(tag1.get() )
+		if (tag2.get() is not None and tag2.get() is not ""):
+			tags.append(tag2.get())
+		if (tag3.get() is not None and tag3.get() is not ""):
+			tags.append(tag3.get())
+
+		with open(filename) as infile:
+			d = json.load(infile)
+
+		logging.info('mastlistitems\n'+str(list(masterlist.get(0,tk.END))))
+		
+		for i in masterlist.get(0,tk.END):
+			d.update({i:tags})
+		logging.info("dict:"+str(d))
+		with open(filename,'w') as outfile:
+			json.dump(d,outfile,ensure_ascii=False)
+
+	# --------------------------------
+	# method:     on_MLLoad_button_click
+	# description: load the json file at the location specified in the filename entry box
+	# params:     none
+	# returns:    none
+	# --------------------------------
+	def on_MLLoad_button_click(self):
+		filenamebox = self.builder.get_object('MLFilename_Entry')
+		filename = filenamebox.get()
+		masterlist = self.builder.get_object('MasterList_Listbox')
+		with open(filename) as infile:
+			d = json.load(infile)
+
+		for i in d.keys():
+			masterlist.insert(tk.END,i)
 
 
 
@@ -125,7 +272,6 @@ class Application:
 # params:     none
 # returns:    none
 # --------------------------------
-
 class GoogleKnowledgeGraph(object):
 	#set initial params
 	def __init__(self):
@@ -215,7 +361,7 @@ class WordNet:
 
 
 
-
+#program entry point
 if __name__=='__main__':
 	root = tk.Tk()
 	app = Application(root)

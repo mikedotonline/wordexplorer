@@ -89,6 +89,7 @@
         </child>
         <child>
           <object class="tk.Listbox" id="GKResults_Listbox">
+            <property name="selectmode">extended</property>
             <layout>
               <property name="column">0</property>
               <property name="columnspan">3</property>
@@ -100,6 +101,7 @@
         </child>
         <child>
           <object class="tk.Button" id="GKSelectAll_Button">
+            <property name="command">on_GKSelectAll_button_click</property>
             <property name="text" translatable="yes">Select All</property>
             <layout>
               <property name="column">0</property>
@@ -111,6 +113,7 @@
         </child>
         <child>
           <object class="tk.Button" id="GKSelectNone_Button">
+            <property name="command">on_GKSelectNone_button_click</property>
             <property name="text" translatable="yes">Select None</property>
             <layout>
               <property name="column">1</property>
@@ -122,6 +125,7 @@
         </child>
         <child>
           <object class="tk.Button" id="GKAddToMaster_Button">
+            <property name="command">on_GKAddToMaster_button_click</property>
             <property name="text" translatable="yes">Add to Master List</property>
             <layout>
               <property name="column">2</property>
@@ -212,6 +216,8 @@
         </child>
         <child>
           <object class="tk.Listbox" id="WNSynonyms_Listbox">
+            <property name="exportselection">false</property>
+            <property name="selectmode">extended</property>
             <layout>
               <property name="column">0</property>
               <property name="columnspan">3</property>
@@ -223,6 +229,8 @@
         </child>
         <child>
           <object class="tk.Listbox" id="WNHyponyms_Listbox">
+            <property name="exportselection">false</property>
+            <property name="selectmode">extended</property>
             <layout>
               <property name="column">1</property>
               <property name="propagate">True</property>
@@ -232,6 +240,8 @@
         </child>
         <child>
           <object class="tk.Listbox" id="WNHypernyms_Listbox">
+            <property name="exportselection">false</property>
+            <property name="selectmode">extended</property>
             <layout>
               <property name="column">2</property>
               <property name="propagate">True</property>
@@ -241,6 +251,7 @@
         </child>
         <child>
           <object class="tk.Button" id="WNSelectAll_Button">
+            <property name="command">on_WNSelectAll_button_click</property>
             <property name="text" translatable="yes">Select All</property>
             <layout>
               <property name="column">0</property>
@@ -252,6 +263,7 @@
         </child>
         <child>
           <object class="tk.Button" id="WNSelectNone_Button">
+            <property name="command">on_WNSelectNone_button_click</property>
             <property name="text" translatable="yes">Select None</property>
             <layout>
               <property name="column">1</property>
@@ -263,6 +275,7 @@
         </child>
         <child>
           <object class="tk.Button" id="WNAddToMaster_Button">
+            <property name="command">on_WNAddToMaster_button_click</property>
             <property name="text" translatable="yes">Add to Master List</property>
             <layout>
               <property name="column">2</property>
@@ -298,6 +311,9 @@
         </child>
         <child>
           <object class="tk.Listbox" id="MasterList_Listbox">
+            <property name="exportselection">false</property>
+            <property name="selectmode">extended</property>
+            <property name="width">50</property>
             <layout>
               <property name="column">0</property>
               <property name="propagate">True</property>
@@ -306,7 +322,48 @@
           </object>
         </child>
         <child>
+          <object class="ttk.Label" id="Tags_Label">
+            <property name="text" translatable="yes">Tags to apply</property>
+            <layout>
+              <property name="column">1</property>
+              <property name="propagate">True</property>
+              <property name="row">0</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Entry" id="MLTag1_Entry">
+            <layout>
+              <property name="column">1</property>
+              <property name="propagate">True</property>
+              <property name="row">1</property>
+              <property name="sticky">nw</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Entry" id="MLTag2_Entry">
+            <layout>
+              <property name="column">1</property>
+              <property name="propagate">True</property>
+              <property name="row">1</property>
+              <property name="sticky">w</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Entry" id="MLTag3_Entry">
+            <layout>
+              <property name="column">1</property>
+              <property name="propagate">True</property>
+              <property name="row">1</property>
+              <property name="sticky">sw</property>
+            </layout>
+          </object>
+        </child>
+        <child>
           <object class="tk.Button" id="MLDelete_Button">
+            <property name="command">on_MLDelete_button_click</property>
             <property name="text" translatable="yes">Delete Selected</property>
             <layout>
               <property name="column">0</property>
@@ -318,6 +375,7 @@
         </child>
         <child>
           <object class="tk.Button" id="MLLoad_Button">
+            <property name="command">on_MLLoad_button_click</property>
             <property name="text" translatable="yes">Load</property>
             <layout>
               <property name="column">1</property>
@@ -329,12 +387,24 @@
         </child>
         <child>
           <object class="tk.Button" id="MLSave_Button">
+            <property name="command">on_MLSave_button_click</property>
             <property name="text" translatable="yes">Save</property>
             <layout>
               <property name="column">2</property>
               <property name="propagate">True</property>
               <property name="row">2</property>
               <property name="sticky">w</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Entry" id="MLFilename_Entry">
+            <property name="text" translatable="yes">masterlist.json</property>
+            <layout>
+              <property name="column">0</property>
+              <property name="propagate">True</property>
+              <property name="row">2</property>
+              <property name="sticky">e</property>
             </layout>
           </object>
         </child>
