@@ -1,411 +1,936 @@
 <?xml version='1.0' encoding='utf-8'?>
 <interface>
-  <object class="tk.Frame" id="main_window">
+  <object class="ttk.Frame" id="main_window">
     <property name="height">600</property>
-    <property name="width">400</property>
+    <property name="width">600</property>
     <layout>
       <property name="column">0</property>
       <property name="propagate">True</property>
       <property name="row">0</property>
     </layout>
     <child>
-      <object class="tk.Label" id="title_label">
-        <property name="text" translatable="yes">Find new words and test UI</property>
+      <object class="ttk.Notebook" id="Notebook_1">
+        <property name="height">600</property>
+        <property name="width">800</property>
         <layout>
           <property name="column">0</property>
           <property name="propagate">True</property>
           <property name="row">0</property>
-          <property name="sticky">nw</property>
-        </layout>
-      </object>
-    </child>
-    <child>
-      <object class="tk.Frame" id="graph_window">
-        <property name="background">#7777ff</property>
-        <property name="borderwidth">2</property>
-        <property name="height">200</property>
-        <property name="width">200</property>
-        <layout>
-          <property name="column">0</property>
-          <property name="propagate">True</property>
-          <property name="row">1</property>
         </layout>
         <child>
-          <object class="tk.Label" id="GKGraphTitle_label">
-            <property name="text" translatable="yes">Google Knowledge Graph</property>
-            <layout>
-              <property name="column">0</property>
-              <property name="propagate">True</property>
-              <property name="row">0</property>
-            </layout>
+          <object class="ttk.Notebook.Tab" id="WordDiscovery_Tab">
+            <property name="text" translatable="yes">Phase II: Word Discovery</property>
+            <child>
+              <object class="tk.Frame" id="tab1_main_window">
+                <property name="height">600</property>
+                <property name="width">400</property>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="propagate">True</property>
+                  <property name="row">0</property>
+                </layout>
+                <child>
+                  <object class="tk.Label" id="title_label">
+                    <property name="text" translatable="yes">Find new words and test UI</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="propagate">True</property>
+                      <property name="row">0</property>
+                      <property name="sticky">nw</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Labelframe" id="graph_window">
+                    <property name="height">200</property>
+                    <property name="padding">10</property>
+                    <property name="text" translatable="yes">1: Google Knowledge Graph</property>
+                    <property name="width">200</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="propagate">True</property>
+                      <property name="row">1</property>
+                    </layout>
+                    <child>
+                      <object class="tk.Entry" id="GKSearchTerm_Entry">
+                        <property name="text" translatable="yes">Search Term</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">nw</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="GKLimitNum_Entry">
+                        <property name="text" translatable="yes">20</property>
+                        <property name="width">2</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">nw</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="GKTypes_Entry">
+                        <property name="text" translatable="yes">Product</property>
+                        <property name="width">8</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">ne</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Button" id="GKSearch_Button">
+                        <property name="command">on_GKSearch_button_click</property>
+                        <property name="text" translatable="yes">Search</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">ne</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="pygubu.builder.widgets.scrollbarhelper" id="GKResults_scrollbarhelper">
+                        <property name="scrolltype">vertical</property>
+                        <property name="usemousewheel">false</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="columnspan">3</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                        </layout>
+                        <child>
+                          <object class="tk.Listbox" id="GKResults_Listbox">
+                            <property name="selectmode">extended</property>
+                            <property name="width">50</property>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="columnspan">3</property>
+                              <property name="propagate">True</property>
+                              <property name="row">0</property>
+                            </layout>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Button" id="GKSelectAll_Button">
+                        <property name="command">on_GKSelectAll_button_click</property>
+                        <property name="text" translatable="yes">Select All</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">3</property>
+                          <property name="sticky">nw</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Button" id="GKSelectNone_Button">
+                        <property name="command">on_GKSelectNone_button_click</property>
+                        <property name="text" translatable="yes">Select None</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">3</property>
+                          <property name="sticky">nw</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Button" id="GKAddToMaster_Button">
+                        <property name="command">on_GKAddToMaster_button_click</property>
+                        <property name="text" translatable="yes">Add to Master List</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">3</property>
+                          <property name="sticky">nw</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Labelframe" id="wordnet_window">
+                    <property name="height">250</property>
+                    <property name="text" translatable="yes">2: Wordnet Via NLTK</property>
+                    <property name="width">200</property>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="propagate">True</property>
+                      <property name="row">1</property>
+                    </layout>
+                    <child>
+                      <object class="tk.Entry" id="WNSearchTerm_Entry">
+                        <property name="text" translatable="yes">Search Term</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">nw</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Button" id="WNSearch_Button">
+                        <property name="command">on_WNSearch_button_click</property>
+                        <property name="text" translatable="yes">Search</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">ne</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Label" id="WNSynonyms_Label">
+                        <property name="text" translatable="yes">Synonyms</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Label" id="WNHyponyms_Label">
+                        <property name="text" translatable="yes">Hyponyms</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Label" id="WNHypernyms_Label">
+                        <property name="text" translatable="yes">Hypernyms</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="pygubu.builder.widgets.scrollbarhelper" id="WNSynonyms_scrollbarhelper">
+                        <property name="scrolltype">both</property>
+                        <property name="usemousewheel">false</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">3</property>
+                        </layout>
+                        <child>
+                          <object class="tk.Listbox" id="WNSynonyms_Listbox">
+                            <property name="exportselection">false</property>
+                            <property name="selectmode">extended</property>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="propagate">True</property>
+                              <property name="row">0</property>
+                            </layout>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="pygubu.builder.widgets.scrollbarhelper" id="WNHyponyms_scrollbarhelper">
+                        <property name="scrolltype">both</property>
+                        <property name="usemousewheel">false</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">3</property>
+                        </layout>
+                        <child>
+                          <object class="tk.Listbox" id="WNHyponyms_Listbox">
+                            <property name="exportselection">false</property>
+                            <property name="selectmode">extended</property>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="propagate">True</property>
+                              <property name="row">0</property>
+                            </layout>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="pygubu.builder.widgets.scrollbarhelper" id="WNHyperNyms_scrollbarhelper">
+                        <property name="scrolltype">both</property>
+                        <property name="usemousewheel">false</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">3</property>
+                        </layout>
+                        <child>
+                          <object class="tk.Listbox" id="WNHypernyms_Listbox">
+                            <property name="exportselection">false</property>
+                            <property name="selectmode">extended</property>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="propagate">True</property>
+                              <property name="row">0</property>
+                            </layout>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Button" id="WNSelectAll_Button">
+                        <property name="command">on_WNSelectAll_button_click</property>
+                        <property name="text" translatable="yes">Select All</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">4</property>
+                          <property name="sticky">nw</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Button" id="WNSelectNone_Button">
+                        <property name="command">on_WNSelectNone_button_click</property>
+                        <property name="text" translatable="yes">Select None</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">4</property>
+                          <property name="sticky">nw</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Button" id="WNAddToMaster_Button">
+                        <property name="command">on_WNAddToMaster_button_click</property>
+                        <property name="text" translatable="yes">Add to Master List</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">4</property>
+                          <property name="sticky">nw</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Labelframe" id="outputList_window">
+                    <property name="height">200</property>
+                    <property name="text" translatable="yes">3: Master List</property>
+                    <property name="width">200</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="columnspan">2</property>
+                      <property name="propagate">True</property>
+                      <property name="row">2</property>
+                      <property name="sticky">w</property>
+                    </layout>
+                    <child>
+                      <object class="tk.Label" id="MasterList_Label">
+                        <property name="text" translatable="yes">Word List</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="pygubu.builder.widgets.scrollbarhelper" id="MLList_scrollbarhelper">
+                        <property name="scrolltype">both</property>
+                        <property name="usemousewheel">false</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                        </layout>
+                        <child>
+                          <object class="tk.Listbox" id="MasterList_Listbox">
+                            <property name="exportselection">false</property>
+                            <property name="selectmode">extended</property>
+                            <property name="width">50</property>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="propagate">True</property>
+                              <property name="row">1</property>
+                            </layout>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Label" id="Tags_Label">
+                        <property name="text" translatable="yes">Tags to apply</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="MLTag1_Entry">
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">nw</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="MLTag2_Entry">
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="MLTag3_Entry">
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">sw</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Button" id="MLDelete_Button">
+                        <property name="command">on_MLDelete_button_click</property>
+                        <property name="text" translatable="yes">Delete Selected</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Button" id="MLLoad_Button">
+                        <property name="command">on_MLLoad_button_click</property>
+                        <property name="text" translatable="yes">Load</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Button" id="MLSave_Button">
+                        <property name="command">on_MLSave_button_click</property>
+                        <property name="text" translatable="yes">Save</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="MLFilename_Entry">
+                        <property name="text" translatable="yes">masterlist.json</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                          <property name="sticky">e</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
           </object>
         </child>
         <child>
-          <object class="tk.Entry" id="GKSearchTerm_Entry">
-            <property name="text" translatable="yes">Search Term</property>
-            <layout>
-              <property name="column">0</property>
-              <property name="propagate">True</property>
-              <property name="row">1</property>
-              <property name="sticky">nw</property>
-            </layout>
+          <object class="ttk.Notebook.Tab" id="CorpusFormation_Tab">
+            <property name="text" translatable="yes">Phase II: Corpus Formation</property>
+            <child>
+              <object class="ttk.Labelframe" id="Tab2_Labelframe">
+                <property name="height">200</property>
+                <property name="text" translatable="yes">Perfect your SQL and test it</property>
+                <property name="width">200</property>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="propagate">True</property>
+                  <property name="row">0</property>
+                </layout>
+                <child>
+                  <object class="ttk.Labelframe" id="WordList_Labelframe">
+                    <property name="height">200</property>
+                    <property name="text" translatable="yes">1: Word List</property>
+                    <property name="width">400</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="propagate">True</property>
+                      <property name="row">0</property>
+                    </layout>
+                    <child>
+                      <object class="ttk.Entry" id="WLFile_Entry">
+                        <property name="text" translatable="yes">masterlist.json</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="sticky">nw</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Button" id="WLLoad_Button">
+                        <property name="command">on_WLLoad_button_click</property>
+                        <property name="text" translatable="yes">load</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="sticky">ne</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Button" id="WLRemove_Button">
+                        <property name="command">on_WLRemove_button_click</property>
+                        <property name="text" translatable="yes">Remove Word</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                          <property name="sticky">nw</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="pygubu.builder.widgets.scrollbarhelper" id="WLTerms_Treeview_Scrollbarhelper">
+                        <property name="scrolltype">both</property>
+                        <property name="usemousewheel">false</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                        </layout>
+                        <child>
+                          <object class="ttk.Treeview" id="WLTerms_Treeview">
+                            <property name="selectmode">extended</property>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="propagate">True</property>
+                              <property name="row">0</property>
+                            </layout>
+                            <child>
+                              <object class="ttk.Treeview.Column" id="Column_2">
+                                <property name="column_anchor">w</property>
+                                <property name="heading_anchor">w</property>
+                                <property name="minwidth">20</property>
+                                <property name="stretch">true</property>
+                                <property name="text" translatable="yes">Tag 1</property>
+                                <property name="tree_column">false</property>
+                                <property name="visible">true</property>
+                                <property name="width">30</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="ttk.Treeview.Column" id="Column_3">
+                                <property name="column_anchor">w</property>
+                                <property name="heading_anchor">w</property>
+                                <property name="minwidth">20</property>
+                                <property name="stretch">true</property>
+                                <property name="text" translatable="yes">Tag 2</property>
+                                <property name="tree_column">false</property>
+                                <property name="visible">true</property>
+                                <property name="width">30</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="ttk.Treeview.Column" id="Column_4">
+                                <property name="column_anchor">w</property>
+                                <property name="heading_anchor">w</property>
+                                <property name="minwidth">20</property>
+                                <property name="stretch">true</property>
+                                <property name="text" translatable="yes">Tag 3</property>
+                                <property name="tree_column">false</property>
+                                <property name="visible">true</property>
+                                <property name="width">30</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Labelframe" id="SQL_Labelframe">
+                    <property name="height">200</property>
+                    <property name="text" translatable="yes">2: SQL Generation</property>
+                    <property name="width">400</property>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="columnspan">3</property>
+                      <property name="propagate">True</property>
+                      <property name="row">0</property>
+                      <property name="sticky">nw</property>
+                    </layout>
+                    <child>
+                      <object class="ttk.Label" id="SQLDB_Label">
+                        <property name="text" translatable="yes">Database Information</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="SQLHost_Entry">
+                        <property name="text" translatable="yes">host</property>
+                        <property name="width">20</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="SQLPort_Entry">
+                        <property name="text" translatable="yes">port</property>
+                        <property name="width">20</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="SQLUserFile_Entry">
+                        <property name="text" translatable="yes">userinfo.json</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="SQLDB_Entry">
+                        <property name="text" translatable="yes">db_name</property>
+                        <property name="width">10</property>
+                        <layout>
+                          <property name="column">3</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Label" id="SQLTable_Label">
+                        <property name="text" translatable="yes">Social Data Table Info</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="SQLTableName_Entry">
+                        <property name="text" translatable="yes">table name</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">3</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="SQLDataCol_Entry">
+                        <property name="text" translatable="yes">data col</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">3</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="SQLGeom_Entry">
+                        <property name="text" translatable="yes">geo col</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">3</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Label" id="SQLAreaBoundary_Label">
+                        <property name="text" translatable="yes">Areal Boundary Table Info</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">4</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="SQLBoundaryTable_Entry">
+                        <property name="text" translatable="yes">table name</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">5</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="SQLBoundaryGeom_Entry">
+                        <property name="text" translatable="yes">geom</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">5</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="SQLBoundaryName_Entry">
+                        <property name="text" translatable="yes">Area Name Col</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">5</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Button" id="SQLGenerate_Button">
+                        <property name="command">on_SQLGenerate_button_click</property>
+                        <property name="text" translatable="yes">Generate SQL</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">6</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Button" id="SQLDefaultVal_Button">
+                        <property name="command">on_SQLDefaultVal_button_click</property>
+                        <property name="text" translatable="yes">Default db values</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">6</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Checkbutton" id="SQLArea_Checkbutton">
+                        <property name="offvalue">0</property>
+                        <property name="onvalue">True</property>
+                        <property name="text" translatable="yes">Use Area</property>
+                        <property name="variable">boolean:SQLArea_check_value</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">6</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Labelframe" id="SQLStatement_Labelframe">
+                    <property name="height">200</property>
+                    <property name="text" translatable="yes">3: Inspect SQL Statement</property>
+                    <property name="width">200</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="propagate">True</property>
+                      <property name="row">1</property>
+                    </layout>
+                    <child>
+                      <object class="pygubu.builder.widgets.scrollbarhelper" id="SQLS_scrollbarhelper">
+                        <property name="scrolltype">both</property>
+                        <property name="usemousewheel">false</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                        </layout>
+                        <child>
+                          <object class="tk.Text" id="SQLS_Text">
+                            <property name="height">10</property>
+                            <property name="text" translatable="yes">generated sql here</property>
+                            <property name="width">50</property>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="propagate">True</property>
+                              <property name="row">0</property>
+                            </layout>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Button" id="SQLSLoad_Button">
+                        <property name="command">on_SQLSLoad_button_click</property>
+                        <property name="text" translatable="yes">Load SQL</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">n</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Button" id="SQLSSave_Button">
+                        <property name="command">on_SQLSSave_button_click</property>
+                        <property name="text" translatable="yes">Save SQL</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">ne</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="SQLSFile_Entry">
+                        <property name="text" translatable="yes">selectstatement.sql</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Labelframe" id="Corpus_Labelframe">
+                    <property name="height">200</property>
+                    <property name="text" translatable="yes">4: Corpus Preview</property>
+                    <property name="width">200</property>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="propagate">True</property>
+                      <property name="row">1</property>
+                    </layout>
+                    <child>
+                      <object class="tk.Listbox" id="CorpusPreview_Listbox">
+                        <property name="width">70</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Button" id="CorpusLoad_Button">
+                        <property name="command">on_CorpusLoad_button_click</property>
+                        <property name="text" translatable="yes">Load Results</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="CorpusLimit_Entry">
+                        <property name="text" translatable="yes">100</property>
+                        <property name="width">5</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
           </object>
         </child>
         <child>
-          <object class="tk.Entry" id="GKLimitNum_Entry">
-            <property name="text" translatable="yes">20</property>
-            <property name="width">2</property>
-            <layout>
-              <property name="column">1</property>
-              <property name="propagate">True</property>
-              <property name="row">1</property>
-              <property name="sticky">nw</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="ttk.Entry" id="GKTypes_Entry">
-            <property name="text" translatable="yes">Product</property>
-            <property name="width">8</property>
-            <layout>
-              <property name="column">1</property>
-              <property name="propagate">True</property>
-              <property name="row">1</property>
-              <property name="sticky">ne</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="tk.Button" id="GKSearch_Button">
-            <property name="command">on_GKSearch_button_click</property>
-            <property name="text" translatable="yes">Search</property>
-            <layout>
-              <property name="column">2</property>
-              <property name="propagate">True</property>
-              <property name="row">1</property>
-              <property name="sticky">ne</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="tk.Listbox" id="GKResults_Listbox">
-            <property name="selectmode">extended</property>
-            <layout>
-              <property name="column">0</property>
-              <property name="columnspan">3</property>
-              <property name="propagate">True</property>
-              <property name="row">2</property>
-              <property name="sticky">nw</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="tk.Button" id="GKSelectAll_Button">
-            <property name="command">on_GKSelectAll_button_click</property>
-            <property name="text" translatable="yes">Select All</property>
-            <layout>
-              <property name="column">0</property>
-              <property name="propagate">True</property>
-              <property name="row">3</property>
-              <property name="sticky">nw</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="tk.Button" id="GKSelectNone_Button">
-            <property name="command">on_GKSelectNone_button_click</property>
-            <property name="text" translatable="yes">Select None</property>
-            <layout>
-              <property name="column">1</property>
-              <property name="propagate">True</property>
-              <property name="row">3</property>
-              <property name="sticky">nw</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="tk.Button" id="GKAddToMaster_Button">
-            <property name="command">on_GKAddToMaster_button_click</property>
-            <property name="text" translatable="yes">Add to Master List</property>
-            <layout>
-              <property name="column">2</property>
-              <property name="propagate">True</property>
-              <property name="row">3</property>
-              <property name="sticky">nw</property>
-            </layout>
-          </object>
-        </child>
-      </object>
-    </child>
-    <child>
-      <object class="tk.Frame" id="wordnet_window">
-        <property name="background">#ff8000</property>
-        <property name="borderwidth">2</property>
-        <property name="height">200</property>
-        <property name="width">200</property>
-        <layout>
-          <property name="column">1</property>
-          <property name="propagate">True</property>
-          <property name="row">1</property>
-        </layout>
-        <child>
-          <object class="tk.Label" id="wordnetTitle_label">
-            <property name="text" translatable="yes">Wordnet Via NLTK </property>
-            <layout>
-              <property name="column">0</property>
-              <property name="propagate">True</property>
-              <property name="row">0</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="tk.Entry" id="WNSearchTerm_Entry">
-            <property name="text" translatable="yes">Search Term</property>
-            <layout>
-              <property name="column">0</property>
-              <property name="propagate">True</property>
-              <property name="row">1</property>
-              <property name="sticky">nw</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="tk.Button" id="WNSearch_Button">
-            <property name="command">on_WNSearch_button_click</property>
-            <property name="text" translatable="yes">Search</property>
-            <layout>
-              <property name="column">1</property>
-              <property name="propagate">True</property>
-              <property name="row">1</property>
-              <property name="sticky">ne</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="tk.Label" id="WNSynonyms_Label">
-            <property name="text" translatable="yes">Synonyms</property>
-            <layout>
-              <property name="column">0</property>
-              <property name="propagate">True</property>
-              <property name="row">2</property>
-              <property name="sticky">w</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="tk.Label" id="WNHyponyms_Label">
-            <property name="text" translatable="yes">Hyponyms</property>
-            <layout>
-              <property name="column">1</property>
-              <property name="propagate">True</property>
-              <property name="row">2</property>
-              <property name="sticky">w</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="tk.Label" id="WNHypernyms_Label">
-            <property name="text" translatable="yes">Hypernyms</property>
-            <layout>
-              <property name="column">2</property>
-              <property name="propagate">True</property>
-              <property name="row">2</property>
-              <property name="sticky">w</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="tk.Listbox" id="WNSynonyms_Listbox">
-            <property name="exportselection">false</property>
-            <property name="selectmode">extended</property>
-            <layout>
-              <property name="column">0</property>
-              <property name="columnspan">3</property>
-              <property name="propagate">True</property>
-              <property name="row">3</property>
-              <property name="sticky">w</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="tk.Listbox" id="WNHyponyms_Listbox">
-            <property name="exportselection">false</property>
-            <property name="selectmode">extended</property>
-            <layout>
-              <property name="column">1</property>
-              <property name="propagate">True</property>
-              <property name="row">3</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="tk.Listbox" id="WNHypernyms_Listbox">
-            <property name="exportselection">false</property>
-            <property name="selectmode">extended</property>
-            <layout>
-              <property name="column">2</property>
-              <property name="propagate">True</property>
-              <property name="row">3</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="tk.Button" id="WNSelectAll_Button">
-            <property name="command">on_WNSelectAll_button_click</property>
-            <property name="text" translatable="yes">Select All</property>
-            <layout>
-              <property name="column">0</property>
-              <property name="propagate">True</property>
-              <property name="row">4</property>
-              <property name="sticky">nw</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="tk.Button" id="WNSelectNone_Button">
-            <property name="command">on_WNSelectNone_button_click</property>
-            <property name="text" translatable="yes">Select None</property>
-            <layout>
-              <property name="column">1</property>
-              <property name="propagate">True</property>
-              <property name="row">4</property>
-              <property name="sticky">nw</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="tk.Button" id="WNAddToMaster_Button">
-            <property name="command">on_WNAddToMaster_button_click</property>
-            <property name="text" translatable="yes">Add to Master List</property>
-            <layout>
-              <property name="column">2</property>
-              <property name="propagate">True</property>
-              <property name="row">4</property>
-              <property name="sticky">nw</property>
-            </layout>
-          </object>
-        </child>
-      </object>
-    </child>
-    <child>
-      <object class="tk.Frame" id="outputList_window">
-        <property name="background">#008040</property>
-        <property name="height">200</property>
-        <property name="width">200</property>
-        <layout>
-          <property name="column">0</property>
-          <property name="columnspan">2</property>
-          <property name="propagate">True</property>
-          <property name="row">2</property>
-          <property name="sticky">w</property>
-        </layout>
-        <child>
-          <object class="tk.Label" id="MasterList_Label">
-            <property name="text" translatable="yes">Master List</property>
-            <layout>
-              <property name="column">0</property>
-              <property name="propagate">True</property>
-              <property name="row">0</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="tk.Listbox" id="MasterList_Listbox">
-            <property name="exportselection">false</property>
-            <property name="selectmode">extended</property>
-            <property name="width">50</property>
-            <layout>
-              <property name="column">0</property>
-              <property name="propagate">True</property>
-              <property name="row">1</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="ttk.Label" id="Tags_Label">
-            <property name="text" translatable="yes">Tags to apply</property>
-            <layout>
-              <property name="column">1</property>
-              <property name="propagate">True</property>
-              <property name="row">0</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="ttk.Entry" id="MLTag1_Entry">
-            <layout>
-              <property name="column">1</property>
-              <property name="propagate">True</property>
-              <property name="row">1</property>
-              <property name="sticky">nw</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="ttk.Entry" id="MLTag2_Entry">
-            <layout>
-              <property name="column">1</property>
-              <property name="propagate">True</property>
-              <property name="row">1</property>
-              <property name="sticky">w</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="ttk.Entry" id="MLTag3_Entry">
-            <layout>
-              <property name="column">1</property>
-              <property name="propagate">True</property>
-              <property name="row">1</property>
-              <property name="sticky">sw</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="tk.Button" id="MLDelete_Button">
-            <property name="command">on_MLDelete_button_click</property>
-            <property name="text" translatable="yes">Delete Selected</property>
-            <layout>
-              <property name="column">0</property>
-              <property name="propagate">True</property>
-              <property name="row">2</property>
-              <property name="sticky">w</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="tk.Button" id="MLLoad_Button">
-            <property name="command">on_MLLoad_button_click</property>
-            <property name="text" translatable="yes">Load</property>
-            <layout>
-              <property name="column">1</property>
-              <property name="propagate">True</property>
-              <property name="row">2</property>
-              <property name="sticky">w</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="tk.Button" id="MLSave_Button">
-            <property name="command">on_MLSave_button_click</property>
-            <property name="text" translatable="yes">Save</property>
-            <layout>
-              <property name="column">2</property>
-              <property name="propagate">True</property>
-              <property name="row">2</property>
-              <property name="sticky">w</property>
-            </layout>
-          </object>
-        </child>
-        <child>
-          <object class="ttk.Entry" id="MLFilename_Entry">
-            <property name="text" translatable="yes">masterlist.json</property>
-            <layout>
-              <property name="column">0</property>
-              <property name="propagate">True</property>
-              <property name="row">2</property>
-              <property name="sticky">e</property>
-            </layout>
+          <object class="ttk.Notebook.Tab" id="TopicModel_Tab">
+            <property name="text" translatable="yes">Phase III: Topic Modelling</property>
+            <child>
+              <object class="ttk.Labelframe" id="Labelframe_3">
+                <property name="height">200</property>
+                <property name="text" translatable="yes">Labelframe_3</property>
+                <property name="width">200</property>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="propagate">True</property>
+                  <property name="row">0</property>
+                </layout>
+                <child>
+                  <object class="ttk.Button" id="Button_7">
+                    <property name="text" translatable="yes">Button_7</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="propagate">True</property>
+                      <property name="row">0</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Button" id="Button_8">
+                    <property name="text" translatable="yes">Button_8</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="propagate">True</property>
+                      <property name="row">1</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Button" id="Button_9">
+                    <property name="text" translatable="yes">Button_9</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="propagate">True</property>
+                      <property name="row">2</property>
+                    </layout>
+                  </object>
+                </child>
+              </object>
+            </child>
           </object>
         </child>
       </object>

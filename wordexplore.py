@@ -38,9 +38,21 @@ class Application:
 
 		#2 Load a UI file
 		builder.add_from_file('word_explore.ui')
+		#builder.add_from_file('packing_notebook.ui')
 
 		# Create the widget using a master as parent
 		self.mainwindow = builder.get_object('main_window', master)
+		#self.mainwindow = builder.get_object('main', master)
+
+		#connect scrollbar
+		# listbox = self.builder.get_object('WLTerms_Treeview')
+		# scroll = self.builder.get_object("scrollbarhelper_2")
+		# listbox.configure(yscrollcommand=scroll.set)
+		# scroll.configure(command=listbox.yview)
+
+		#GKList = self.builder.get_object("GKResults_Listbox")
+		#GKList.pack(fill=tk.BOTH)
+
 
 		#connect callbacks
 		builder.connect_callbacks(self)
@@ -265,6 +277,146 @@ class Application:
 			masterlist.insert(tk.END,i)
 
 
+	''' TAB 2 Event Handlers
+	--------------------------------------------------------------------------------------
+	--------------------------------------------------------------------------------------
+	'''
+
+	# --------------------------------
+	# method:     on_WLLoad_button_click
+	# description: load the json file at the location specified in the filename entry box
+	# params:     none
+	# returns:    none
+	# --------------------------------
+	def on_WLLoad_button_click(self):
+		tree = self.builder.get_object('WLTerms_Treeview')
+
+		filenamebox = self.builder.get_object('WLFile_Entry')
+		filename = filenamebox.get()
+		with open(filename) as infile:
+			d = json.load(infile)
+
+		for i in d.keys():
+			tree.insert('','end',text=i,values=d[i])
+
+
+	# --------------------------------
+	# method:     on_WLRemove_button_click
+	# description: remove list items in the event they are not helpful
+	# params:     none
+	# returns:    none
+	# --------------------------------
+	def on_WLRemove_button_click(self):
+		tree = self.builder.get_object('WLTerms_Treeview')
+		selecteditem = tree.selection()
+		#delete from last to first to preserve list indexes
+		for i in selecteditem[::-1]:
+			tree.delete(i)
+	
+	# --------------------------------
+	# method:     on_SQLGenerate_button_click
+	# description: load the json file at the location specified in the filename entry box
+	# params:     none
+	# returns:    none
+	# --------------------------------
+	def on_SQLGenerate_button_click(self):
+		host=self.builder.get_object('SQLHost_Entry').get()
+		port=self.builder.get_object('SQLPort_Entry').get()
+		db=self.builder.get_object('SQLDB_Entry').get()
+		
+		tbl=self.builder.get_object('SQLTableName_Entry').get()
+		datacol=self.builder.get_object('SQLDataCol_Entry').get()
+		geomcol=self.builder.get_object('SQLGeom_Entry').get()
+		
+		bndrytbl=self.builder.get_object('SQLBoundaryTable_Entry').get()
+		bndrygeom=self.builder.get_object('SQLBoundaryGeom_Entry').get()
+		bndryname=self.builder.get_object('SQLBoundaryName_Entry').get()
+
+		areacheck = self.builder.get_variable('SQLArea_check_value').get()
+
+		wherestring =""
+		tree = self.builder.get_object('WLTerms_Treeview')
+		for i in tree.get_children():
+			#print tree.item(i)["text"]
+			wherestring+= datacol+" LIKE (\'%"+tree.item(i)["text"]+"%\')' OR"
+
+		wherestring=wherestring[:-2] #get rid of the last OR statement tacked onto the end
+		
+		self.SQLString =""
+		# print areacheck
+		if areacheck:
+			print "area check on"
+			self.SQLSString= "SELECT "+tbl+".*,"+bndrytbl+"."+bndryname+\
+								" FROM "+tbl+","+bndrytbl+" "+" WHERE "
+			wherestring +="AND ST_CONTAINS(ST_TRANSFORMS("+bndrytbl+"."+bndrygeom+\
+								", 4326),"+tbl+"."+geomcol
+
+		else:
+			print "area check off"
+			self.SQLString = "SELECT * FROM "+tbl+" WHERE "
+
+		
+
+		self.SQLString+=wherestring
+
+		self.builder.get_object('SQLS_Text').delete("1.0",tk.END)
+		self.builder.get_object('SQLS_Text').insert(tk.END,self.SQLString)
+	
+	# --------------------------------
+	# method:     on_SQLDefault_button_click
+	# description: throw in the default values for my database information so that i don't need to keep doing this
+	# params:     none
+	# returns:    none
+	# todo:			name it not hard coded using a json file. for now i'm just too lazy....
+	# --------------------------------
+	def on_SQLDefaultVal_button_click(self):
+		self.builder.get_object('SQLHost_Entry').delete(0,tk.END)
+		self.builder.get_object('SQLHost_Entry').insert(0,'')
+		self.builder.get_object('SQLPort_Entry').delete(0,tk.END)
+		self.builder.get_object('SQLPort_Entry').insert(0,'')
+		self.builder.get_object('SQLDB_Entry').delete(0,tk.END)
+		self.builder.get_object('SQLDB_Entry').insert(0,'')
+		self.builder.get_object('SQLTableName_Entry').delete(0,tk.END)
+		self.builder.get_object('SQLTableName_Entry').insert(0,'')
+		self.builder.get_object('SQLDataCol_Entry').delete(0,tk.END)
+		self.builder.get_object('SQLDataCol_Entry').insert(0,'')
+		self.builder.get_object('SQLGeom_Entry').delete(0,tk.END)
+		self.builder.get_object('SQLGeom_Entry').insert(0,'')
+		self.builder.get_object('SQLBoundaryTable_Entry').delete(0,tk.END)
+		self.builder.get_object('SQLBoundaryTable_Entry').insert(0,'')
+		self.builder.get_object('SQLBoundaryGeom_Entry').delete(0,tk.END)
+		self.builder.get_object('SQLBoundaryGeom_Entry').insert(0,'geom')
+		self.builder.get_object('SQLBoundaryName_Entry').delete(0,tk.END)
+		self.builder.get_object('SQLBoundaryName_Entry').insert(0,'name')		
+
+
+	# --------------------------------
+	# method:     on_SQLSLoad_button_click
+	# description: load the json file at the location specified in the filename entry box
+	# params:     none
+	# returns:    none
+	# --------------------------------
+	def on_SQLSLoad_button_click(self):
+		pass
+
+	# --------------------------------
+	# method:     on_SQLSSave_button_click
+	# description: load the json file at the location specified in the filename entry box
+	# params:     none
+	# returns:    none
+	# --------------------------------
+	def on_SQLSSave_button_click(self):
+		pass
+
+	# --------------------------------
+	# method:     on_SQLSSave_button_click
+	# description: load the json file at the location specified in the filename entry box
+	# params:     none
+	# returns:    none
+	# --------------------------------
+	def on_CorpusLoad_button_click(self):
+		pass
+	
 
 # --------------------------------
 # class:     GoogleKnowledgeGraph
@@ -275,8 +427,7 @@ class Application:
 class GoogleKnowledgeGraph(object):
 	#set initial params
 	def __init__(self):
-		#self.api_key = open('k.key').read()
-		self.api_key=''
+		self.api_key = open('k.key').read()
 		self.service_url = 'https://kgsearch.googleapis.com/v1/entities:search'
 	# --------------------------------
 	# method:     get_response
@@ -358,7 +509,6 @@ class WordNet:
 		for i,j in enumerate(wn.synsets(self.word)):
 			li.append(list(chain(*[l.lemma_names() for l in j.hypernyms()])))
 		return li
-
 
 
 #program entry point
