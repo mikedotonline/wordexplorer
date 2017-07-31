@@ -2,7 +2,7 @@
 <interface>
   <object class="ttk.Frame" id="main_window">
     <property name="height">600</property>
-    <property name="width">600</property>
+    <property name="width">800</property>
     <layout>
       <property name="column">0</property>
       <property name="propagate">True</property>
@@ -754,7 +754,7 @@
                     </child>
                     <child>
                       <object class="ttk.Checkbutton" id="SQLArea_Checkbutton">
-                        <property name="offvalue">0</property>
+                        <property name="offvalue">False</property>
                         <property name="onvalue">True</property>
                         <property name="text" translatable="yes">Use Area</property>
                         <property name="variable">boolean:SQLArea_check_value</property>
@@ -848,13 +848,24 @@
                       <property name="row">1</property>
                     </layout>
                     <child>
-                      <object class="tk.Listbox" id="CorpusPreview_Listbox">
-                        <property name="width">70</property>
+                      <object class="pygubu.builder.widgets.scrollbarhelper" id="CorpusPreview_scrollbarhelper">
+                        <property name="scrolltype">both</property>
+                        <property name="usemousewheel">false</property>
                         <layout>
                           <property name="column">0</property>
                           <property name="propagate">True</property>
                           <property name="row">1</property>
                         </layout>
+                        <child>
+                          <object class="tk.Listbox" id="CorpusPreview_Listbox">
+                            <property name="width">60</property>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="propagate">True</property>
+                              <property name="row">0</property>
+                            </layout>
+                          </object>
+                        </child>
                       </object>
                     </child>
                     <child>
@@ -890,9 +901,9 @@
           <object class="ttk.Notebook.Tab" id="TopicModel_Tab">
             <property name="text" translatable="yes">Phase III: Topic Modelling</property>
             <child>
-              <object class="ttk.Labelframe" id="Labelframe_3">
+              <object class="ttk.Labelframe" id="topic_Labelframe">
                 <property name="height">200</property>
-                <property name="text" translatable="yes">Labelframe_3</property>
+                <property name="text" translatable="yes">Topic Generation</property>
                 <property name="width">200</property>
                 <layout>
                   <property name="column">0</property>
@@ -900,33 +911,434 @@
                   <property name="row">0</property>
                 </layout>
                 <child>
-                  <object class="ttk.Button" id="Button_7">
-                    <property name="text" translatable="yes">Button_7</property>
-                    <layout>
-                      <property name="column">0</property>
-                      <property name="propagate">True</property>
-                      <property name="row">0</property>
-                    </layout>
-                  </object>
-                </child>
-                <child>
-                  <object class="ttk.Button" id="Button_8">
-                    <property name="text" translatable="yes">Button_8</property>
+                  <object class="ttk.Labelframe" id="TopicDBInfo_Labelframe1">
+                    <property name="height">200</property>
+                    <property name="text" translatable="yes">1. Database Info</property>
+                    <property name="width">300</property>
                     <layout>
                       <property name="column">0</property>
                       <property name="propagate">True</property>
                       <property name="row">1</property>
                     </layout>
+                    <child>
+                      <object class="ttk.Label" id="TopicDBInfo_Label">
+                        <property name="text" translatable="yes">Connection</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="TopicHost_Entry">
+                        <property name="text" translatable="yes">host</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="TopicDB_Entry">
+                        <property name="text" translatable="yes">db name</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="TopicPort_Entry">
+                        <property name="text" translatable="yes">port</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">3</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="TopicUser_Entry">
+                        <property name="text" translatable="yes">userinfo.json</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">4</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Label" id="TopicSocialTable_Label">
+                        <property name="text" translatable="yes">Social Table</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="TopicSocialTable_Entry">
+                        <property name="text" translatable="yes">tablename</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="TopicSocialGeom_Entry">
+                        <property name="text" translatable="yes">geom</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">3</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="TopicSocialData_Entry">
+                        <property name="text" translatable="yes">socialcol</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Label" id="TopicAreaTable_Label">
+                        <property name="text" translatable="yes">AreaTable</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="TopicBndryTable_Entry">
+                        <property name="text" translatable="yes">table</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="TopicBndryName_Entry">
+                        <property name="text" translatable="yes">label</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="TopicBndryGeom_Entry">
+                        <property name="text" translatable="yes">geom</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">3</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Entry" id="TopicDefaultValues_Entry">
+                        <property name="text" translatable="yes">db_defaultinfo.json</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">5</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Button" id="TopicDefaultValuesLoad_Button">
+                        <property name="command">on_TopicDefaultValuesLoad_button_click</property>
+                        <property name="text" translatable="yes">Load</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">5</property>
+                        </layout>
+                      </object>
+                    </child>
                   </object>
                 </child>
                 <child>
-                  <object class="ttk.Button" id="Button_9">
-                    <property name="text" translatable="yes">Button_9</property>
+                  <object class="ttk.Labelframe" id="TopicParameters_Labelframe">
+                    <property name="height">200</property>
+                    <property name="text" translatable="yes">2. Topic Model Parameters</property>
+                    <property name="width">300</property>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="propagate">True</property>
+                      <property name="row">1</property>
+                    </layout>
+                    <child>
+                      <object class="ttk.Frame" id="TopicStoplist_Frame">
+                        <property name="height">200</property>
+                        <property name="width">200</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                        </layout>
+                        <child>
+                          <object class="tk.Label" id="TopicStoplist_Label">
+                            <property name="text" translatable="yes">Stop List</property>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="propagate">True</property>
+                              <property name="row">0</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="ttk.Entry" id="TopicParamsFile_Entry">
+                            <property name="text" translatable="yes">params.json</property>
+                            <property name="width">15</property>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="propagate">True</property>
+                              <property name="row">6</property>
+                              <property name="sticky">e</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="pygubu.builder.widgets.tkscrollbarhelper" id="TopicStopwods_tkscrollbarhelper">
+                            <property name="scrolltype">both</property>
+                            <property name="usemousewheel">false</property>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="propagate">True</property>
+                              <property name="row">1</property>
+                              <property name="rowspan">5</property>
+                            </layout>
+                            <child>
+                              <object class="tk.Listbox" id="TopicStopwords_Listbox">
+                                <property name="height">6</property>
+                                <property name="width">30</property>
+                                <layout>
+                                  <property name="column">0</property>
+                                  <property name="propagate">True</property>
+                                  <property name="row">0</property>
+                                </layout>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="tk.Label" id="TopicParameters_Label">
+                            <property name="text" translatable="yes">Model Parameters</property>
+                            <layout>
+                              <property name="column">1</property>
+                              <property name="propagate">True</property>
+                              <property name="row">0</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="tk.Entry" id="TopicParamTopics_Entry">
+                            <property name="text" translatable="yes">Number of Topics</property>
+                            <layout>
+                              <property name="column">1</property>
+                              <property name="propagate">True</property>
+                              <property name="row">1</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="tk.Entry" id="TopicParamWords_Entry">
+                            <property name="text" translatable="yes">Words Per Topic</property>
+                            <layout>
+                              <property name="column">1</property>
+                              <property name="propagate">True</property>
+                              <property name="row">2</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="tk.Entry" id="TopicParamAlpha_Entry">
+                            <property name="text" translatable="yes">Alpha</property>
+                            <layout>
+                              <property name="column">1</property>
+                              <property name="propagate">True</property>
+                              <property name="row">3</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="tk.Entry" id="TopicParamPasses_Entry">
+                            <property name="text" translatable="yes">Number of Passes</property>
+                            <layout>
+                              <property name="column">1</property>
+                              <property name="propagate">True</property>
+                              <property name="row">4</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="tk.Entry" id="TopicParamUpdate_Entry">
+                            <property name="text" translatable="yes">Update Every</property>
+                            <layout>
+                              <property name="column">1</property>
+                              <property name="propagate">True</property>
+                              <property name="row">5</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="tk.Button" id="TopicParamDefaults_Button">
+                            <property name="command">on_TopicParamDefaults_button_click</property>
+                            <property name="text" translatable="yes">Load Defaults</property>
+                            <layout>
+                              <property name="column">1</property>
+                              <property name="propagate">True</property>
+                              <property name="row">6</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="ttk.Label" id="TopicParamTopics_Label">
+                            <property name="text" translatable="yes">Topics</property>
+                            <layout>
+                              <property name="column">3</property>
+                              <property name="propagate">True</property>
+                              <property name="row">1</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="ttk.Label" id="TopicParamWords_Label">
+                            <property name="text" translatable="yes">Words</property>
+                            <layout>
+                              <property name="column">3</property>
+                              <property name="propagate">True</property>
+                              <property name="row">2</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="ttk.Label" id="TopicParamAlpha_Label">
+                            <property name="text" translatable="yes">Alpha</property>
+                            <layout>
+                              <property name="column">3</property>
+                              <property name="propagate">True</property>
+                              <property name="row">3</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="ttk.Label" id="TopicParamPasses_Label">
+                            <property name="text" translatable="yes">Passes</property>
+                            <layout>
+                              <property name="column">3</property>
+                              <property name="propagate">True</property>
+                              <property name="row">4</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="ttk.Label" id="TopicParamUpdate_Label">
+                            <property name="text" translatable="yes">Update</property>
+                            <layout>
+                              <property name="column">3</property>
+                              <property name="propagate">True</property>
+                              <property name="row">5</property>
+                            </layout>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Labelframe" id="TopicRunModel_Labelframe">
+                    <property name="height">200</property>
+                    <property name="text" translatable="yes">3. Run Topic Model</property>
                     <layout>
                       <property name="column">0</property>
                       <property name="propagate">True</property>
                       <property name="row">2</property>
+                      <property name="sticky">w</property>
                     </layout>
+                    <child>
+                      <object class="tk.Button" id="TopicModelRun_Button">
+                        <property name="command">on_TopicModelRun_button_click</property>
+                        <property name="text" translatable="yes">Run Model</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">0</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="TopicModelFile_Entry">
+                        <property name="text" translatable="yes">topicmodel.json</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Button" id="TopicModelLoad_Button">
+                        <property name="command">on_TopicModelLoad_button_click</property>
+                        <property name="text" translatable="yes">Load</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Button" id="TopicModelSave_Button">
+                        <property name="command">on_TopicModelSave_button_click</property>
+                        <property name="text" translatable="yes">Save</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="propagate">True</property>
+                          <property name="row">2</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="pygubu.builder.widgets.scrollbarhelper" id="TopicModel_scrollbarhelper">
+                        <property name="scrolltype">both</property>
+                        <property name="usemousewheel">false</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="propagate">True</property>
+                          <property name="row">1</property>
+                          <property name="sticky">w</property>
+                        </layout>
+                        <child>
+                          <object class="ttk.Treeview" id="TopicModel_Treeview">
+                            <property name="selectmode">extended</property>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="columnspan">3</property>
+                              <property name="propagate">True</property>
+                              <property name="row">0</property>                              
+                            </layout>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
                   </object>
                 </child>
               </object>

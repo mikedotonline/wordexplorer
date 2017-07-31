@@ -23,6 +23,19 @@ from itertools import chain
 import logging #get some logging going to make it easier to debug
 logging.basicConfig(level=logging.INFO) #optional argument, filename="tk_freebase-explorer.log" and filemode='w'
 
+import psycopg2
+
+import time
+import sys
+import re
+from gensim import corpora, models
+
+import warnings
+warnings.filterwarnings("ignore",category=DeprecationWarning)
+
+from pprint import pprint as pp
+
+
 # --------------------------------
 # class:     Application
 # description: code for the click handling and interface of the program. 
@@ -58,6 +71,7 @@ class Application:
 		builder.connect_callbacks(self)
 		#callbacks={'on_GKSearch_button_click':self.on_GKSearch_button_click} 
 		#builder.connect_callbacks(callbacks)
+
 	
 	# --------------------------------
 	# method:     on_GKSearch_button_click
@@ -320,9 +334,9 @@ class Application:
 	# returns:    none
 	# --------------------------------
 	def on_SQLGenerate_button_click(self):
-		host=self.builder.get_object('SQLHost_Entry').get()
-		port=self.builder.get_object('SQLPort_Entry').get()
-		db=self.builder.get_object('SQLDB_Entry').get()
+		#host=self.builder.get_object('SQLHost_Entry').get()
+		#port=self.builder.get_object('SQLPort_Entry').get()
+		#db=self.builder.get_object('SQLDB_Entry').get()
 		
 		tbl=self.builder.get_object('SQLTableName_Entry').get()
 		datacol=self.builder.get_object('SQLDataCol_Entry').get()
@@ -338,18 +352,21 @@ class Application:
 		tree = self.builder.get_object('WLTerms_Treeview')
 		for i in tree.get_children():
 			#print tree.item(i)["text"]
-			wherestring+= datacol+" LIKE (\'%"+tree.item(i)["text"]+"%\')' OR"
+			wherestring+= tbl+"."+datacol+" LIKE (\'%"+tree.item(i)["text"]+"%\') OR "
 
-		wherestring=wherestring[:-2] #get rid of the last OR statement tacked onto the end
+		wherestring=wherestring[:-3] #get rid of the last OR statement tacked onto the end
 		
 		self.SQLString =""
 		# print areacheck
 		if areacheck:
 			print "area check on"
-			self.SQLSString= "SELECT "+tbl+".*,"+bndrytbl+"."+bndryname+\
-								" FROM "+tbl+","+bndrytbl+" "+" WHERE "
-			wherestring +="AND ST_CONTAINS(ST_TRANSFORMS("+bndrytbl+"."+bndrygeom+\
-								", 4326),"+tbl+"."+geomcol
+			self.SQLString= "SELECT "+tbl+".*,"+bndrytbl+"."+bndryname+\
+								" FROM "+bndrytbl+" LEFT JOIN "+tbl+""\
+								" ON ST_CONTAINS(ST_TRANSFORM("+bndrytbl+"."+bndrygeom+",4326),"+tbl+"."+geomcol+") WHERE "
+			#wherestring +="AND ST_CONTAINS(ST_TRANSFORM("+bndrytbl+"."+bndrygeom+\
+			#					", 4326),"+tbl+"."+geomcol+")"
+			print "SQLSTRING:\n"+self.SQLString
+			print "wherestring:\n"+wherestring
 
 		else:
 			print "area check off"
@@ -367,56 +384,443 @@ class Application:
 	# description: throw in the default values for my database information so that i don't need to keep doing this
 	# params:     none
 	# returns:    none
-	# todo:			name it not hard coded using a json file. for now i'm just too lazy....
+	# todo:			create a user configurable json file location entrybox
 	# --------------------------------
 	def on_SQLDefaultVal_button_click(self):
+		#filenamebox = self.builder.get_object('WLFile_Entry')
+		filename = 'db_defaultinfo.json'#filenamebox.get()
+		with open(filename) as infile:
+			d = json.load(infile)
+
 		self.builder.get_object('SQLHost_Entry').delete(0,tk.END)
-		self.builder.get_object('SQLHost_Entry').insert(0,'')
+		self.builder.get_object('SQLHost_Entry').insert(0,d['host'])
 		self.builder.get_object('SQLPort_Entry').delete(0,tk.END)
-		self.builder.get_object('SQLPort_Entry').insert(0,'')
+		self.builder.get_object('SQLPort_Entry').insert(0,d['port'])
 		self.builder.get_object('SQLDB_Entry').delete(0,tk.END)
-		self.builder.get_object('SQLDB_Entry').insert(0,'')
+		self.builder.get_object('SQLDB_Entry').insert(0,d['dbname'])
 		self.builder.get_object('SQLTableName_Entry').delete(0,tk.END)
-		self.builder.get_object('SQLTableName_Entry').insert(0,'')
+		self.builder.get_object('SQLTableName_Entry').insert(0,d['tablename'])
 		self.builder.get_object('SQLDataCol_Entry').delete(0,tk.END)
-		self.builder.get_object('SQLDataCol_Entry').insert(0,'')
+		self.builder.get_object('SQLDataCol_Entry').insert(0,d['datacolumn'])
 		self.builder.get_object('SQLGeom_Entry').delete(0,tk.END)
-		self.builder.get_object('SQLGeom_Entry').insert(0,'')
+		self.builder.get_object('SQLGeom_Entry').insert(0,d['geomcolumn'])
 		self.builder.get_object('SQLBoundaryTable_Entry').delete(0,tk.END)
-		self.builder.get_object('SQLBoundaryTable_Entry').insert(0,'')
+		self.builder.get_object('SQLBoundaryTable_Entry').insert(0,d['boundarytable'])
 		self.builder.get_object('SQLBoundaryGeom_Entry').delete(0,tk.END)
-		self.builder.get_object('SQLBoundaryGeom_Entry').insert(0,'geom')
+		self.builder.get_object('SQLBoundaryGeom_Entry').insert(0,d['boundarygeom'])
 		self.builder.get_object('SQLBoundaryName_Entry').delete(0,tk.END)
-		self.builder.get_object('SQLBoundaryName_Entry').insert(0,'name')		
+		self.builder.get_object('SQLBoundaryName_Entry').insert(0,d['boundaryname'])		
 
 
 	# --------------------------------
 	# method:     on_SQLSLoad_button_click
-	# description: load the json file at the location specified in the filename entry box
+	# description: save a json file at the location specified in the filename entry box
 	# params:     none
 	# returns:    none
 	# --------------------------------
 	def on_SQLSLoad_button_click(self):
-		pass
+		self.builder.get_object('SQLS_Text').delete("1.0",tk.END)
+		fn = self.builder.get_object('SQLSFile_Entry').get()
+		f=open(fn)
+		self.builder.get_object('SQLS_Text').insert(tk.END,f.read())		
 
 	# --------------------------------
 	# method:     on_SQLSSave_button_click
-	# description: load the json file at the location specified in the filename entry box
+	# description: save the json file at the location specified in the filename entry box
 	# params:     none
 	# returns:    none
 	# --------------------------------
 	def on_SQLSSave_button_click(self):
-		pass
+		fn = self.builder.get_object('SQLSFile_Entry').get()
+		f=open(fn,'w')
+		f.write(self.builder.get_object('SQLS_Text').get("1.0",tk.END))
+		f.close()
 
 	# --------------------------------
-	# method:     on_SQLSSave_button_click
-	# description: load the json file at the location specified in the filename entry box
+	# method:     on_CorpusLoad_button_click
+	# description: execute a database search using the sql in the previous box
 	# params:     none
 	# returns:    none
+	# todo:			implement as a treeview to increase readability
 	# --------------------------------
 	def on_CorpusLoad_button_click(self):
-		pass
+		logging.info("starting connection to database")
+
+		#get user credentials
+		filenamebox = self.builder.get_object('SQLUserFile_Entry')
+		filename = filenamebox.get()
+		with open(filename) as infile:
+			d = json.load(infile)
+
+		#set up database connection data
+		db_name = self.builder.get_object('SQLDB_Entry').get()
+		db_user = d["username"]
+		db_host = self.builder.get_object('SQLHost_Entry').get()
+		db_port = self.builder.get_object('SQLPort_Entry').get()
+		db_password = d["password"]
+		connString = "dbname='"+db_name+"' user='"+db_user+"' host='"+db_host+"' port='"+db_port+"' password='"+db_password+"'"
+		
+		#connect to DB
+		conn = psycopg2.connect(connString)
+		logging.info("creating cursor")		
+		curr = conn.cursor() #cursor for reading tweets
+		
+		selectstring = self.builder.get_object('SQLS_Text').get("1.0",tk.END)
+		limit = self.builder.get_object('CorpusLimit_Entry').get()
+		selectstring += " LIMIT "+limit
+		#get data from postgres table	
+		logging.info("executing select statement")
+		curr.execute(selectstring)
+
+		#output the tweets that were found
+		logging.info('writing tweets into listbox')		
+		preview = self.builder.get_object('CorpusPreview_Listbox')
+		preview.delete(0,tk.END)
+		for tweet in curr:
+			s = "tweet:\n\t"+str(tweet)
+			logging.info(s)
+			preview.insert(tk.END,tweet)
 	
+	''' TAB 3 Event Handlers
+	--------------------------------------------------------------------------------------
+	--------------------------------------------------------------------------------------
+	'''
+
+	# --------------------------------
+	# method:     	on_TopicDefaultValuesLoad_button_click
+	# description: 	load the json file at the location specified in the filename entry box
+	# params:     	none
+	# returns:    	none
+	# --------------------------------
+	def on_TopicDefaultValuesLoad_button_click(self):
+		#filename = 'db_defaultinfo.json'#filenamebox.get()
+		filename = self.builder.get_object('TopicDefaultValues_Entry').get()
+		with open(filename) as infile:
+			d = json.load(infile)
+
+		#set the values...
+		self.builder.get_object('TopicHost_Entry').delete(0,tk.END)
+		self.builder.get_object('TopicHost_Entry').insert(0,d['host'])
+		self.builder.get_object('TopicPort_Entry').delete(0,tk.END)
+		self.builder.get_object('TopicPort_Entry').insert(0,d['port'])
+		self.builder.get_object('TopicDB_Entry').delete(0,tk.END)
+		self.builder.get_object('TopicDB_Entry').insert(0,d['dbname'])
+		self.builder.get_object('TopicSocialTable_Entry').delete(0,tk.END)
+		self.builder.get_object('TopicSocialTable_Entry').insert(0,d['tablename'])
+		self.builder.get_object('TopicSocialData_Entry').delete(0,tk.END)
+		self.builder.get_object('TopicSocialData_Entry').insert(0,d['datacolumn'])
+		self.builder.get_object('TopicSocialGeom_Entry').delete(0,tk.END)
+		self.builder.get_object('TopicSocialGeom_Entry').insert(0,d['geomcolumn'])
+		self.builder.get_object('TopicBndryTable_Entry').delete(0,tk.END)
+		self.builder.get_object('TopicBndryTable_Entry').insert(0,d['boundarytable'])
+		self.builder.get_object('TopicBndryGeom_Entry').delete(0,tk.END)
+		self.builder.get_object('TopicBndryGeom_Entry').insert(0,d['boundarygeom'])
+		self.builder.get_object('TopicBndryName_Entry').delete(0,tk.END)
+		self.builder.get_object('TopicBndryName_Entry').insert(0,d['boundaryname'])
+
+	# --------------------------------
+	# method:     	on_TopicParamDefaults_button_click
+	# description: 	load the json file at the location specified in the filename entry box
+	# params:     	none
+	# returns:    	none
+	# --------------------------------
+	def on_TopicParamDefaults_button_click(self):
+		filename = self.builder.get_object('TopicParamsFile_Entry').get()
+		with open(filename) as infile:
+			d = json.load(infile)
+
+		self.builder.get_object('TopicStopwords_Listbox').delete(0,tk.END)
+		for w in d['stopwords']:
+			self.builder.get_object('TopicStopwords_Listbox').insert(tk.END,w.replace("\\'","\'"))
+
+		self.builder.get_object('TopicParamTopics_Entry').delete(0,tk.END)
+		self.builder.get_object('TopicParamTopics_Entry').insert(0,d['topics'])
+		self.builder.get_object('TopicParamWords_Entry').delete(0,tk.END)
+		self.builder.get_object('TopicParamWords_Entry').insert(0,d['words'])
+		self.builder.get_object('TopicParamAlpha_Entry').delete(0,tk.END)
+		self.builder.get_object('TopicParamAlpha_Entry').insert(0,d['alpha'])
+		self.builder.get_object('TopicParamPasses_Entry').delete(0,tk.END)
+		self.builder.get_object('TopicParamPasses_Entry').insert(0,d['passes'])
+		self.builder.get_object('TopicParamUpdate_Entry').delete(0,tk.END)
+		self.builder.get_object('TopicParamUpdate_Entry').insert(0,d['update'])
+
+	# --------------------------------
+	# method:     	on_TopicModelRun_button_click
+	# description: 	load the json file at the location specified in the filename entry box
+	# params:     	none
+	# returns:    	none
+	# --------------------------------
+	def on_TopicModelRun_button_click(self):
+		start = time.time() #to know how long the model took to run
+		
+		#get user credentials
+		filenamebox = self.builder.get_object('TopicUser_Entry')
+		filename = filenamebox.get()
+		with open(filename) as infile:
+			d = json.load(infile)
+		#set up database connection data
+		db_name = self.builder.get_object('TopicDB_Entry').get()
+		db_user = d["username"]
+		db_host = self.builder.get_object('TopicHost_Entry').get()
+		db_port = self.builder.get_object('TopicPort_Entry').get()
+		db_password = d["password"]
+		connString = "dbname='"+db_name+"' user='"+db_user+"' host='"+db_host+"' port='"+db_port+"' password='"+db_password+"'"
+		
+		#connect to DB
+		conn = psycopg2.connect(connString)
+		logging.info("creating cursor")		
+		curr = conn.cursor() #cursor for reading tweets
+
+		# select only three nHoods to keep problem size reasonable for now....
+		poly_tableName = self.builder.get_object('TopicBndryTable_Entry').get()
+		poly_identCol = self.builder.get_object('TopicBndryName_Entry').get()
+		poly_geomCol = self.builder.get_object('TopicBndryGeom_Entry').get()
+		
+		socialcol = self.builder.get_object('TopicSocialData_Entry').get()
+		socialtable = self.builder.get_object('TopicSocialTable_Entry').get()
+		#selectstring = "SELECT "+socialcol+" FROM "+socialtable
+
+		# for testing onle
+		selectstring = "SELECT * FROM van_tweets WHERE tweet "\
+			"LIKE (\'%obesity%\') OR" \
+			" tweet LIKE (\'%unhealthy%\') OR"\
+			" tweet LIKE (\'%obese%\') OR tweet LIKE (\'%junk food%\') OR"\
+			" tweet LIKE (\'%foodcoma%\') OR"\
+			" tweet LIKE (\'%overweight%\') OR"\
+			" tweet LIKE (\'%bloated%\') OR"\
+			" tweet LIKE (\'%fatty%\') OR"\
+			" tweet LIKE (\'%sugartax%\') OR"\
+			" tweet LIKE (\'%cholesterol%\') OR"\
+			" tweet like (\'%lethargic%\') OR"\
+			" tweet like (\'%couchpotato%\') OR"\
+			" tweet like (\'%sugar%\') OR"\
+			" tweet like (\'%fattest%\') OR"\
+			" tweet like (\'%fastfood%\') OR"\
+			" tweet like (\'%fast food%\') OR"\
+			" tweet like (\'%feel fat%\') OR"\
+			" tweet like (\'%bacon%\') OR"\
+			" tweet like (\'%burgers%\') OR"\
+			" tweet like (\'%sausage%\') OR"\
+			" tweet like (\'%kfc%\') OR"\
+			" tweet like (\'%mcdonalds%\') OR"\
+			" tweet like (\'%a&w%\') OR"\
+			" tweet like (\'%AandW%\') OR"\
+			" tweet like (\'%wendys%\') OR"\
+			" tweet like (\'%subway%\') OR"\
+			" tweet like (\'%timhortons%\') OR"\
+			" tweet like (\'%tim hortons%\') OR"\
+			" tweet like (\'%burgerking%\') OR"\
+			" tweet like (\'%burger king%\') OR"\
+			" tweet like (\'%taco bell%\') OR"\
+			" tweet like (\'%tacobell%\') OR"\
+			" tweet like (\'%dairyqueen%\') OR"\
+			" tweet like (\'%dairy queen%\') OR"\
+			" tweet like (\'%arbys%\') OR"\
+			" tweet like (\'%icecream%\') OR"\
+			" tweet like (\'%cola%\') OR"\
+			" tweet like (\'%soda%\') OR"\
+			" tweet like (\'%drpepper%\') OR"\
+			" tweet like (\'%dr pepper%\') OR"\
+			" tweet like (\'%vanilla-coke%\') OR"\
+			" tweet like (\'%fresca%\') OR"\
+			" tweet like (\'%mello yello%\') OR"\
+			" tweet like (\'%mr pibb%\') OR"\
+			" tweet like (\'%mrpibb%\') OR"\
+			" tweet like (\'%pibb xtra%\') OR"\
+			" tweet like (\'%pepsi%\') OR"\
+			" tweet like (\'%mountaindew%\') OR"\
+			" tweet like (\'%rootbeer%\') OR"\
+			" tweet like (\'%7-up%\') OR"\
+			" tweet like (\'%canadadry%\') OR"\
+			" tweet like (\'%canada dry%\') OR"\
+			" tweet like (\'%orangecrush%\') OR"\
+			" tweet like (\'%creamsoda%\') OR"\
+			" tweet like (\'%sunkist%\') OR"\
+			" tweet like (\'%vernors%\') OR"\
+			" tweet like (\'%chickenwings%\') OR"\
+			" tweet like (\'%chicken wings%\') OR"\
+			" tweet like (\'%buffalowings%\') OR"\
+			" tweet like (\'%redbull%\') OR"\
+			" tweet like (\'%red bull%\') OR"\
+			" tweet like (\'%kitkat%\') OR"\
+			" tweet like (\'%kit kat%\') OR"\
+			" tweet like (\'%snickers%\') OR"\
+			" tweet like (\'%crunchie%\') OR"\
+			" tweet like (\'%3muskateers%\') OR"\
+			" tweet like (\'%candybar%\') OR"\
+			" tweet like (\'%reeses%\') OR"\
+			" tweet like (\'%marsbar%\') OR"\
+			" tweet like (\'%fried%\') OR"\
+			" tweet like (\'%babyruth%\') OR"\
+			" tweet like (\'%candy%\') OR"\
+			" tweet like (\'%frosting%\') OR"\
+			" tweet like (\'%crispy crunch%\') OR"\
+			" tweet like (\'%crispycrunch%\') OR"\
+			" tweet like (\'%ohhenry%\') OR"\
+			" tweet like (\'%mrbig%\') OR"\
+			" tweet like (\'%mr big%\') OR"\
+			" tweet like (\'%coffeecrisp%\') OR"\
+			" tweet like (\'%smarties%\') OR"\
+			" tweet like (\'%oreo%\') OR"\
+			" tweet like (\'%aero%\') OR"\
+			" tweet like (\'%poprocks%\') OR"\
+			" tweet like (\'%pop rocks%\') OR"\
+			" tweet like (\'%pocky%\') OR"\
+			" tweet like (\'%jawbreaker%\') OR"\
+			" tweet like (\'%twizzler%\') OR"\
+			" tweet like (\'%skittles%\') OR"\
+			" tweet like (\'%tootsie roll%\') OR"\
+			" tweet like (\'%tootsieroll%\') OR"\
+			" tweet like (\'%jellybelly%\') OR"\
+			" tweet like (\'%jelly belly%\') OR"\
+			" tweet like (\'%jelly beans%\') OR"\
+			" tweet like (\'%jellybean%\') OR"\
+			" tweet like (\'%butterfinger%\') OR"\
+			" tweet like (\'%twix%\') OR"\
+			" tweet like (\'%hershey%\') OR"\
+			" tweet like (\'%gummi%\') OR"\
+			" tweet like (\'%coffee crisp%\') OR"\
+			" tweet like (\'%oh henry%\') OR"\
+			" tweet like (\'%fries%\') OR"\
+			" tweet like (\'%potato chips%\') OR"\
+			" tweet like (\'%butter%\') OR"\
+			" tweet like (\'%pizza%\') OR"\
+			" tweet like (\'%donut%\') OR"\
+			" tweet like (\'%fruitloops%\') OR"\
+			" tweet like (\'%potatochips%\') OR"\
+			" tweet like (\'%nachos%\') OR"\
+			" tweet like (\'%poutine%\') OR"\
+			" tweet like (\'%fried%\') OR"\
+			" tweet like (\'%mozerellasticks%\') OR"\
+			" tweet like (\'%mozerella sticks%\') OR"\
+			" tweet like (\'%corndog%\') OR"\
+			" tweet like (\'%corn dog%\') OR"\
+			" tweet like (\'%hotdog%\') OR"\
+			" tweet like (\'%hot dog%\') OR"\
+			" tweet like (\'%fried%\')"
+			#" tweet like (\'%beer%\')"
+		
+		#limit = self.builder.get_object('CorpusLimit_Entry').get()
+		#selectstring += " LIMIT "+limit
+		#get data from postgres table	
+		logging.info("executing select statement")
+		curr.execute(selectstring)
+
+
+		#create documents list
+		logging.info("Starting GENSIM code")
+		documents=[]
+		logging.info("INCOMMING TWEET CORPUS SIZE: "+str(curr.rowcount))
+		for tweet in curr:
+			#tweet = str(curr.fetchone()[0])
+			documents.append(' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)|(gt)"," ",tweet[0]).split()).lower())
+		#stopwords
+		logging.info("CORPUS SIZE AFTER REGEX: "+str(len(documents)))
+		
+
+		#stoplist work
+		s = ""
+		for w in self.builder.get_object('TopicStopwords_Listbox').get(0,tk.END):
+			s+=w+" "
+		stoplist = set(s.split())
+		#logging.info("s:\n\t"+s)
+		#logging.info("stopwords"+str([i for i in self.builder.get_object('TopicStopwords_Listbox').get(0,tk.END)]))
+		#logging.info(stoplist)
+		
+		#tokenize
+		texts = [[word for word in document.lower().split() if word not in stoplist] for document in documents]		
+		logging.info("CORPUS SIZE AFTER STOPLIST: "+str(len(texts)))	
+
+		#singles reduction
+		all_tokens = sum(texts, [])
+		logging.info("beginning tokenization")
+		tokens_once = set(word for word in set(all_tokens) if all_tokens.count(word) == 1)
+		logging.info("words tokenized, starting single mentioned word reduction")
+		texts = [[word for word in text if word not in tokens_once] for text in texts]
+		logging.info("words mentioned only once removed")
+		#remove nulls
+		texts = filter(None,texts)
+		logging.info("CORPUS SIZE AFTER EMPTY ROWS REMOVED: "+str(len(texts)))			
+		dictionary = corpora.Dictionary(texts)
+		
+		#create corpus, tfidf, set up model
+		corpus = [dictionary.doc2bow(text) for text in texts]
+		tfidf = models.TfidfModel(corpus) #step 1. --initialize(train) a model
+		corpus_tfidf = tfidf[corpus] # Apply TFIDF transform to entire corpus
+		logging.info("starting LDA model")
+
+		#run model
+		tnum=int(self.builder.get_object('TopicParamTopics_Entry').get())
+		topnval=int(self.builder.get_object('TopicParamWords_Entry').get())
+		talpha = float(self.builder.get_object('TopicParamAlpha_Entry').get())
+		tpasses = int(self.builder.get_object('TopicParamPasses_Entry').get())
+		tupdate = int(self.builder.get_object('TopicParamUpdate_Entry').get())
+		model = models.ldamodel.LdaModel(corpus_tfidf, id2word=dictionary, alpha=talpha, num_topics=tnum, update_every=tupdate, passes=tpasses)
+
+		end = time.time()
+		elapsed = end-start
+		s= "\n\nProcess completed in %.2f minutes"%(elapsed/60)
+		logging.info(s)
+		
+		# print diagnosgtic information
+		print "\n\n\n\t\t\ttopics"
+		print "\nSelect Statement: "+selectstring
+		print "Corpus Size: "+ str(len(texts))
+		m =(model.show_topics(num_topics=tnum, num_words=topnval, log=False,formatted=False))
+		pp(m)
+		
+
+		#setup the columns of the treeview
+		tree = self.builder.get_object('TopicModel_Treeview')
+		colnum=0
+		l =[]
+		for c in range(0,tnum+1):
+			s="col"+str(colnum)
+			l.append(s)
+			colnum+=1			
+		tree['columns']=tuple(l)
+		logging.info("tree[columns]:"+str(tree['columns']))
+							
+		#write model values to treeview
+		a=0	
+		tree.column('#0',width=5)
+		for i in m:
+			v = [ j[0]+str(round(j[1],4)) for j in i[1]]
+			logging.info('inserting'+str(v))
+			tree.insert('','end',text=str(a),values=v)
+			a+=1
+
+		for c in range(0,tnum+1):
+			logging.info("settings for: col"+str(c))			
+			tree.heading('#'+str(c),text="word "+str(c))
+			tree.column('#'+str(c),stretch=tk.NO, width=30)
+		tree.column('#11',width=5,stretch=tk.NO)
+		# WHY DOES THIS 11TH COLUMN EXIST AT ALL (line 777?)
+		#WHY IS THE WIDGET BECOMMING SO FUCKING WIDE!!!
+
+	# --------------------------------
+	# method:     	on_TopicModelLoad_button_click
+	# description: 	load the json file at the location specified in the filename entry box
+	# params:     	none
+	# returns:    	none
+	# --------------------------------
+	def on_TopicModelLoad_button_click(self):
+		pass
+	# --------------------------------
+	# method:     	on_TopicModelSave_button_click
+	# description: 	load the json file at the location specified in the filename entry box
+	# params:    	none
+	# returns:    	none
+	# --------------------------------
+	def on_TopicModelSave_button_click(self):
+		tree = self.builder.get_object('TopicModel_Treeview')
+		d ={}
+		for i in tree.get_children():
+			d["topic"]=i
+		pp(d)
+
+
+
 
 # --------------------------------
 # class:     GoogleKnowledgeGraph
@@ -509,6 +913,8 @@ class WordNet:
 		for i,j in enumerate(wn.synsets(self.word)):
 			li.append(list(chain(*[l.lemma_names() for l in j.hypernyms()])))
 		return li
+
+
 
 
 #program entry point
